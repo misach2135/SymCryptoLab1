@@ -6,6 +6,7 @@
 #include <cwctype>
 #include <map>
 #include <algorithm>
+#include <cmath>
 
 const int NUM_LETTERS = 33;
 
@@ -68,16 +69,17 @@ public:
             if (counts[i] > 0) {
                 sorted_counts.push_back({ wchar_t(i + L'а'), counts[i] });
             }
-        }
+        };
+
         std::sort(sorted_counts.begin(), sorted_counts.end(),
-            [](std::pair<wchar_t, int> a, std::pair<wchar_t, int> b){
-            if (a.second != b.second) {
-                return a.second > b.second;
-            }
-            else {
-                return a.first < b.first;
-            }
-        });
+            [](std::pair<wchar_t, int> a, std::pair<wchar_t, int> b) {
+                if (a.second != b.second) {
+                    return a.second > b.second;
+                }
+                else {
+                    return a.first < b.first;
+                }
+            });
 
         for (const auto& pair : sorted_counts) {
             std::wcout << pair.first << L": " << pair.second << "\n";
@@ -86,13 +88,29 @@ public:
         for (const auto& pair : bigrams) {
             std::wcout << pair.first << L": " << pair.second << "\n";
         }
+
+        // перший порядок пішов
+        double H1 = 0.0;
+        for (const auto& pair : sorted_counts) {
+            double p = static_cast<double>(pair.second) / text.size();
+            H1 -= p * log2(p);
+        }
+        std::wcout << L"1H: " << H1 << "\n";
+
+        // другий
+        double H2 = 0.0;
+        for (const auto& pair : bigrams) {
+            double p = static_cast<double>(pair.second) / (text.size() / 2);
+            H2 -= p * log2(p);
+        }
+        std::wcout << L"2H: " << H2 << "\n";
     }
 };
 
 
 int main()
 {
-    FrequencyAnalyzer analyzer( std::wstring("test.txt"));
-    char filePath[] = ("D:\\example.txt");
+
+    FrequencyAnalyzer::processFile("D:\\example.txt");
     return 0;
 }
